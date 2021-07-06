@@ -8,13 +8,13 @@ const App: FC = () => {
   const [generation, setGeneration] = useState(0);
   const DIMS = useMemo(
     () => ({
-      WIDTH: 5,
-      HEIGHT: 5,
+      X: 10,
+      Y: 15,
     }),
     []
   );
   const initialState = useMemo(
-    () => new Array(DIMS.HEIGHT).fill(new Array(DIMS.WIDTH).fill(0)),
+    () => new Array(DIMS.X).fill(new Array(DIMS.Y).fill(0)),
     [DIMS]
   );
   const [board, setBoard] = useState<number[][]>(initialState);
@@ -26,11 +26,11 @@ const App: FC = () => {
       for (let xAdd = -1; xAdd < 2; xAdd++) {
         const newX = x + xAdd;
 
-        if (newX >= 0 && newX <= DIMS.HEIGHT - 1) {
+        if (newX >= 0 && newX <= DIMS.X - 1) {
           for (let yAdd = -1; yAdd < 2; yAdd++) {
             const newY = y + yAdd;
 
-            if (newY >= 0 && newY <= DIMS.HEIGHT - 1) {
+            if (newY >= 0 && newY <= DIMS.X - 1) {
               if (newY === y && newX === x) {
                 continue;
               }
@@ -49,8 +49,8 @@ const App: FC = () => {
     const randomPoints = new Map<number, number>();
 
     for (let i = 0; i < 30; i++) {
-      const h = Math.floor(Math.random() * DIMS.HEIGHT);
-      const w = Math.floor(Math.random() * DIMS.WIDTH);
+      const h = Math.floor(Math.random() * DIMS.X);
+      const w = Math.floor(Math.random() * DIMS.Y);
 
       randomPoints.set(h, w);
     }
@@ -140,13 +140,13 @@ const App: FC = () => {
 
   return (
     <>
-      {board.map((r, idx) => {
+      {board.map((r, x) => {
         return (
-          <div className="row" key={idx}>
-            {r.map((n, idxx) => {
+          <div className="row" key={x}>
+            {r.map((n, y) => {
               return (
                 <div
-                  key={`${idx}-${idxx}`}
+                  key={`${x}-${y}`}
                   className={`cell ${n === 1 ? "black" : "white"}`}
                 />
               );
