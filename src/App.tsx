@@ -110,7 +110,9 @@ const App: FC = () => {
       generate();
 
       if (gameState) {
-        requestAnimationFrame(loop);
+        setTimeout(() => {
+          requestAnimationFrame(loop);
+        }, 150);
       }
     };
 
