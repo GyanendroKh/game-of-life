@@ -8,8 +8,8 @@ const App: FC = () => {
   const [generation, setGeneration] = useState(0);
   const DIMS = useMemo(
     () => ({
-      WIDTH: 25,
-      HEIGHT: 20,
+      WIDTH: 5,
+      HEIGHT: 5,
     }),
     []
   );
@@ -18,6 +18,32 @@ const App: FC = () => {
     [DIMS]
   );
   const [board, setBoard] = useState<number[][]>(initialState);
+
+  const getNeighbours = useCallback(
+    (x: number, y: number) => {
+      const neighbours: { x: number; y: number }[] = [];
+
+      for (let xAdd = -1; xAdd < 2; xAdd++) {
+        const newX = x + xAdd;
+
+        if (newX >= 0 && newX <= DIMS.HEIGHT - 1) {
+          for (let yAdd = -1; yAdd < 2; yAdd++) {
+            const newY = y + yAdd;
+
+            if (newY >= 0 && newY <= DIMS.HEIGHT - 1) {
+              if (newY === y && newX === x) {
+                continue;
+              }
+              neighbours.push({ x: newX, y: newY });
+            }
+          }
+        }
+      }
+
+      return neighbours;
+    },
+    [DIMS]
+  );
 
   const randomize = useCallback(() => {
     const randomPoints = new Map<number, number>();
@@ -45,8 +71,34 @@ const App: FC = () => {
   }, [DIMS]);
 
   const generate = useCallback(() => {
+    setBoard((curr) => {
+      return curr.map((r, x) => {
+        return r.map((n, y) => {
+          const isDead = n === 0;
+          const neighbours = getNeighbours(x, y);
+
+          const liveNeighbours = neighbours.filter((n) => {
+            return curr[n.x][n.y] === 1;
+          });
+
+          if (
+            !isDead &&
+            (liveNeighbours.length === 2 || liveNeighbours.length === 3)
+          ) {
+            return 1;
+          }
+
+          if (isDead && liveNeighbours.length === 3) {
+            return 1;
+          }
+
+          return 0;
+        });
+      });
+    });
+
     setGeneration((g) => g + 1);
-  }, []);
+  }, [getNeighbours]);
 
   useEffect(() => {
     let previousTime = 0.0;
@@ -70,6 +122,21 @@ const App: FC = () => {
   useEffect(() => {
     gameState = playing;
   }, [playing]);
+
+  useEffect(() => {
+    setBoard((curr) => {
+      return curr.map((r, x) => {
+        return r.map((_, y) => {
+          if (x === 2) {
+            if ([1, 2, 3].includes(y)) {
+              return 1;
+            }
+          }
+          return 0;
+        });
+      });
+    });
+  }, []);
 
   return (
     <>
