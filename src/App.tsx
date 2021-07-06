@@ -13,14 +13,16 @@ const App: FC = () => {
     }),
     []
   );
-  const [board, setBoard] = useState<number[][]>(() => {
-    return new Array(DIMS.HEIGHT).fill(new Array(DIMS.WIDTH).fill(0));
-  });
+  const initialState = useMemo(
+    () => new Array(DIMS.HEIGHT).fill(new Array(DIMS.WIDTH).fill(0)),
+    [DIMS]
+  );
+  const [board, setBoard] = useState<number[][]>(initialState);
 
-  const generate = useCallback(() => {
+  const randomize = useCallback(() => {
     const randomPoints = new Map<number, number>();
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 30; i++) {
       const h = Math.floor(Math.random() * DIMS.HEIGHT);
       const w = Math.floor(Math.random() * DIMS.WIDTH);
 
@@ -40,9 +42,11 @@ const App: FC = () => {
         });
       });
     });
-
-    setGeneration((g) => g + 1);
   }, [DIMS]);
+
+  const generate = useCallback(() => {
+    setGeneration((g) => g + 1);
+  }, []);
 
   useEffect(() => {
     let previousTime = 0.0;
@@ -88,6 +92,17 @@ const App: FC = () => {
       <br />
       <button onClick={() => setPlaying((curr) => !curr)}>
         {playing ? "Pause" : "Play"}
+      </button>
+      &nbsp;
+      <button onClick={() => randomize()}>Randomize</button>
+      &nbsp;
+      <button
+        onClick={() => {
+          setBoard(initialState);
+          setGeneration(0);
+        }}
+      >
+        Clear
       </button>
     </>
   );
