@@ -8,7 +8,7 @@ const App: FC = () => {
   const [generation, setGeneration] = useState(0);
   const DIMS = useMemo(
     () => ({
-      X: 10,
+      X: 15,
       Y: 15,
     }),
     []
@@ -125,21 +125,6 @@ const App: FC = () => {
     gameState = playing;
   }, [playing]);
 
-  useEffect(() => {
-    setBoard((curr) => {
-      return curr.map((r, x) => {
-        return r.map((_, y) => {
-          if (x === 2) {
-            if ([1, 2, 3].includes(y)) {
-              return 1;
-            }
-          }
-          return 0;
-        });
-      });
-    });
-  }, []);
-
   return (
     <>
       {board.map((r, x) => {
@@ -150,6 +135,23 @@ const App: FC = () => {
                 <div
                   key={`${x}-${y}`}
                   className={`cell ${n === 1 ? "black" : "white"}`}
+                  onClick={() => {
+                    setBoard((curr) => {
+                      return curr.map((r, bx) => {
+                        if (bx === x) {
+                          return r.map((b, by) => {
+                            if (by === y) {
+                              return b === 1 ? 0 : 1;
+                            }
+
+                            return b;
+                          });
+                        }
+
+                        return r;
+                      });
+                    });
+                  }}
                 />
               );
             })}
